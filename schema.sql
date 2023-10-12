@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS urls;
+
+CREATE TABLE urls (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    short_url TEXT NOT NULL,
+    long_url TEXT NOT NULL
+);
