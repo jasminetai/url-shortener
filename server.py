@@ -20,6 +20,7 @@ def index():
     If form for URL is submitted, returns index page with the shortened URL also displayed.
     '''
     if request.method == 'POST':
+        # The user has submitted the form -- create a shortened URL and display it on the page
         short_url = shorten_url(request.form['url'])
         return render_template('index.html', short_url=short_url)
     return render_template('index.html')
@@ -32,7 +33,9 @@ def shorten_url(long_url):
     try:
         conn = get_conn()
         existing_short = conn.execute('SELECT short_url FROM urls').fetchall()
+        existing_short = [short[0] for short in existing_short]
 
+        # Ensure that shortened URL is unique by only breaking the loop when it is unique
         while True:
             short_url = request.base_url + 's/' + ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=8))
             if short_url not in existing_short:
@@ -61,14 +64,16 @@ def redirect_url(short_route):
         print("Database error:", err)
     
     conn.close()
+
     if len(long_url) < 1 or len(long_url[0]) < 1:
         return "Error: invalid short URL"
+    
     return redirect(long_url[0][0], 301)
 
 @app.route('/get_urls', methods=('GET',))
 def list_urls():
     '''
-    Lists current saved URLs as (short_url, long_url) pairs.
+    Lists currently saved URLs as (short_url, long_url) pairs.
     '''
     try:
         conn = get_conn()
